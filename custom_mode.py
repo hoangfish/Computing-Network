@@ -2,6 +2,7 @@
 
 import socket
 import os
+import json
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QInputDialog
 from custom_mode_ui import Ui_CustomModeWindow
@@ -52,9 +53,11 @@ class CustomModeApp(QMainWindow):
                     return
                 s.connect((server_ip, 12345))
 
-                payload = command if argument is None else f"{command}|{argument}"
-                s.send(payload.encode('utf-8'))
-                result = s.recv(100000).decode('utf-8')
+                # Gửi JSON như file cũ
+                payload = json.dumps({"command": command, "value": argument})
+                s.sendall((payload + '\n').encode("utf-8"))
+
+                result = s.recv(100000).decode("utf-8")
                 self.append_output(result)
         except Exception as e:
             self.append_output(f"Error communicating with server: {e}")
