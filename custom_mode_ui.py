@@ -1,149 +1,299 @@
-# -*- coding: utf-8 -*-
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtWidgets, QtCore, QtGui
+import os
+
+def icon(path):
+    return QtGui.QIcon(os.path.join("icons", path))
 
 class Ui_CustomModeWindow(object):
     def setupUi(self, CustomModeWindow):
         CustomModeWindow.setObjectName("CustomModeWindow")
-        CustomModeWindow.resize(900, 700)
-        CustomModeWindow.setWindowTitle("Custom Mode - Remote Control")
+        CustomModeWindow.resize(950, 600)
+        CustomModeWindow.setWindowTitle("Custom Mode - Control Center")
 
         self.centralwidget = QtWidgets.QWidget(CustomModeWindow)
-        self.centralwidget.setObjectName("centralwidget")
+        main_layout = QtWidgets.QVBoxLayout(self.centralwidget)
+        main_layout.setContentsMargins(10, 10, 10, 10)
 
-        # Title label
-        self.titleLabel = QtWidgets.QLabel(self.centralwidget)
-        self.titleLabel.setGeometry(QtCore.QRect(0, 10, 900, 40))
-        self.titleLabel.setWordWrap(True)
-        font = QtGui.QFont()
-        font.setPointSize(18)
-        font.setBold(True)
-        self.titleLabel.setFont(font)
-        self.titleLabel.setAlignment(QtCore.Qt.AlignCenter)
-        self.titleLabel.setText("CUSTOM MODE CONTROL PANEL")
+        # === Taskbar/Header with its own QWidget ===
+        self.taskbarWidget = QtWidgets.QWidget()
+        self.taskbarWidget.setStyleSheet("""
+            background-color: #2c3e50;
+            padding: 12px;
+            border-radius: 8px;
+        """)
+        taskbar_layout = QtWidgets.QHBoxLayout(self.taskbarWidget)
+        taskbar_layout.setContentsMargins(10, 0, 10, 0)
 
-        # Group box: App controls
-        self.groupBoxApps = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBoxApps.setGeometry(QtCore.QRect(20, 60, 400, 160))
-        self.groupBoxApps.setTitle("Apps Control")
-        self.groupBoxApps.setObjectName("groupBoxApps")
+        self.labelTitle = QtWidgets.QLabel("🔧 Custom Control Center")
+        self.labelTitle.setStyleSheet("font-size: 18px; font-weight: bold; color: white;")
+        taskbar_layout.addWidget(self.labelTitle)
+        taskbar_layout.addStretch()
 
-        self.btnListApps = QtWidgets.QPushButton(self.groupBoxApps)
-        self.btnListApps.setGeometry(QtCore.QRect(20, 30, 110, 35))
-        self.btnListApps.setText("List Apps")
+        main_layout.addWidget(self.taskbarWidget)
 
-        self.btnStartApp = QtWidgets.QPushButton(self.groupBoxApps)
-        self.btnStartApp.setGeometry(QtCore.QRect(150, 30, 110, 35))
-        self.btnStartApp.setText("Start App")
 
-        self.btnStopApp = QtWidgets.QPushButton(self.groupBoxApps)
-        self.btnStopApp.setGeometry(QtCore.QRect(280, 30, 110, 35))
-        self.btnStopApp.setText("Stop App")
+        # === IP Layout ===
+        ip_layout = QtWidgets.QHBoxLayout()
+        self.lineEditServerIP = QtWidgets.QLineEdit()
+        self.lineEditServerIP.setPlaceholderText("Enter server IP...")
+        ip_layout.addWidget(QtWidgets.QLabel("Server IP:"))
+        ip_layout.addWidget(self.lineEditServerIP)
+        main_layout.addLayout(ip_layout)
 
-        # Group box: Process controls
-        self.groupBoxProcesses = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBoxProcesses.setGeometry(QtCore.QRect(20, 230, 400, 160))
-        self.groupBoxProcesses.setTitle("Processes Control")
-        self.groupBoxProcesses.setObjectName("groupBoxProcesses")
+        # === Content Layout ===
+        content_layout = QtWidgets.QHBoxLayout()
 
-        self.btnListProcesses = QtWidgets.QPushButton(self.groupBoxProcesses)
-        self.btnListProcesses.setGeometry(QtCore.QRect(20, 30, 110, 35))
-        self.btnListProcesses.setText("List Processes")
+        # === Sidebar ===
+        self.sidebar = QtWidgets.QWidget()
+        main_sidebar_layout = QtWidgets.QVBoxLayout(self.sidebar)
+        main_sidebar_layout.setContentsMargins(0, 0, 0, 0)
+        main_sidebar_layout.setSpacing(8)
 
-        self.btnStartProcess = QtWidgets.QPushButton(self.groupBoxProcesses)
-        self.btnStartProcess.setGeometry(QtCore.QRect(150, 30, 110, 35))
-        self.btnStartProcess.setText("Start Process")
+        button_style = """
+            QPushButton {
+                background-color: #2c3e50;
+                color: white;
+                font-size: 14px;
+                padding: 10px;
+                text-align: left;
+                border: none;
+            }
+            QPushButton:hover {
+                background-color: #34495e;
+            }
+        """
 
-        self.btnStopProcess = QtWidgets.QPushButton(self.groupBoxProcesses)
-        self.btnStopProcess.setGeometry(QtCore.QRect(280, 30, 110, 35))
-        self.btnStopProcess.setText("Stop Process")
+        self.btnSystem = QtWidgets.QPushButton("🖥️ System")
+        process_icon_path = os.path.join(os.path.dirname(__file__), "process.png")
+        self.btnProcesses = QtWidgets.QPushButton("  Processes")
+        self.btnProcesses.setIcon(QtGui.QIcon(process_icon_path))
+        self.btnApps = QtWidgets.QPushButton("  Apps")
+        app_icon_path = os.path.join(os.path.dirname(__file__), "apps_icon.png")
+        self.btnApps.setIcon(QtGui.QIcon(app_icon_path))
+        self.btnFiles = QtWidgets.QPushButton("📁 Files")
+        self.btnWebcam = QtWidgets.QPushButton("📷 Webcam")
+        keylogger_icon_path = os.path.join(os.path.dirname(__file__), "keylogger.png")
+        self.btnKeylogger = QtWidgets.QPushButton("  Keylogger")
+        self.btnKeylogger.setIcon(QtGui.QIcon(keylogger_icon_path))
 
-        # Group box: Keylogger
-        self.groupBoxKeylogger = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBoxKeylogger.setGeometry(QtCore.QRect(20, 400, 400, 90))
-        self.groupBoxKeylogger.setTitle("Keylogger")
-        self.groupBoxKeylogger.setObjectName("groupBoxKeylogger")
+        top_btn_layout = QtWidgets.QVBoxLayout()
+        for btn in [self.btnSystem, self.btnProcesses, self.btnApps,
+                    self.btnFiles, self.btnWebcam, self.btnKeylogger]:
+            btn.setStyleSheet(button_style)
+            top_btn_layout.addWidget(btn)
+        main_sidebar_layout.addLayout(top_btn_layout)
 
-        self.btnStartKeylogger = QtWidgets.QPushButton(self.groupBoxKeylogger)
-        self.btnStartKeylogger.setGeometry(QtCore.QRect(30, 30, 150, 40))
-        self.btnStartKeylogger.setText("Start Keylogger")
+        logo_layout = QtWidgets.QVBoxLayout()
+        logo_layout.addStretch()
+        self.labelSchoolLogo = QtWidgets.QLabel()
+        school_logo_path = os.path.join(os.path.dirname(__file__), "school_logo.png")
+        school_pixmap = QtGui.QPixmap(school_logo_path)
+        self.labelSchoolLogo.setPixmap(
+            school_pixmap.scaled(160, 160, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+        )
+        self.labelSchoolLogo.setAlignment(QtCore.Qt.AlignCenter)
+        logo_layout.addWidget(self.labelSchoolLogo)
+        logo_layout.addStretch()
+        main_sidebar_layout.addLayout(logo_layout)
 
-        self.btnStopKeylogger = QtWidgets.QPushButton(self.groupBoxKeylogger)
-        self.btnStopKeylogger.setGeometry(QtCore.QRect(220, 30, 150, 40))
-        self.btnStopKeylogger.setText("Stop Keylogger")
+        self.btnBack = QtWidgets.QPushButton("🔙 Back")
+        self.btnBack.setStyleSheet("""
+            QPushButton {
+                background-color: #e74c3c;
+                color: white;
+                font-size: 14px;
+                padding: 10px;
+                text-align: left;
+                border: none;
+            }
+            QPushButton:hover {
+                background-color: #c0392b;
+            }
+        """)
+        main_sidebar_layout.addWidget(self.btnBack, alignment=QtCore.Qt.AlignBottom)
 
-        # Group box: System control
-        self.groupBoxSystem = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBoxSystem.setGeometry(QtCore.QRect(450, 60, 420, 120))
-        self.groupBoxSystem.setTitle("System Control")
-        self.groupBoxSystem.setObjectName("groupBoxSystem")
+        self.sidebar.setFixedWidth(160)
+        content_layout.addWidget(self.sidebar)
 
-        self.btnRestart = QtWidgets.QPushButton(self.groupBoxSystem)
-        self.btnRestart.setGeometry(QtCore.QRect(30, 40, 150, 50))
-        self.btnRestart.setText("Restart")
+        # === Pages ===
+        self.stackedWidget = QtWidgets.QStackedWidget()
+        content_layout.addWidget(self.stackedWidget)
+        main_layout.addLayout(content_layout)
 
-        self.btnShutdown = QtWidgets.QPushButton(self.groupBoxSystem)
-        self.btnShutdown.setGeometry(QtCore.QRect(230, 40, 150, 50))
-        self.btnShutdown.setText("Shutdown")
-        #self.btnSystemInfo = QtWidgets.QPushButton(self.groupBoxSystem)
-        #self.btnSystemInfo.setGeometry(QtCore.QRect(30, 90, 350, 35))
-        #self.btnSystemInfo.setText("Show System Info")
+        self.pageSystem = self.create_system_page()
+        self.pageProcesses = self.create_process_page()
+        self.pageApps = self.create_apps_page()
+        self.pageFiles = self.create_files_page()
+        self.pageWebcam = self.create_webcam_page()
+        self.pageKeylogger = self.create_keylogger_page()
+        self.pageEmpty = QtWidgets.QWidget()
 
-        # Group box: File control
-        self.groupBoxFile = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBoxFile.setGeometry(QtCore.QRect(450, 200, 420, 120))
-        self.groupBoxFile.setTitle("File Control")
-        self.groupBoxFile.setObjectName("groupBoxFile")
-
-        self.labelFilePath = QtWidgets.QLabel(self.groupBoxFile)
-        self.labelFilePath.setGeometry(QtCore.QRect(20, 30, 380, 20))
-        self.labelFilePath.setText("File path:")
-
-        self.lineEditFilePath = QtWidgets.QLineEdit(self.groupBoxFile)
-        self.lineEditFilePath.setGeometry(QtCore.QRect(20, 55, 380, 30))
-
-        self.btnGetFile = QtWidgets.QPushButton(self.groupBoxFile)
-        self.btnGetFile.setGeometry(QtCore.QRect(140, 90, 150, 25))
-        self.btnGetFile.setText("Get File Content")
-
-        # Group box: Webcam control
-        self.groupBoxWebcam = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBoxWebcam.setGeometry(QtCore.QRect(450, 350, 420, 160))
-        self.groupBoxWebcam.setTitle("Webcam Control")
-        self.groupBoxWebcam.setObjectName("groupBoxWebcam")
-
-        self.btnCapturePhoto = QtWidgets.QPushButton(self.groupBoxWebcam)
-        self.btnCapturePhoto.setGeometry(QtCore.QRect(30, 40, 150, 40))
-        self.btnCapturePhoto.setText("Capture Photo")
-
-        self.btnRecordVideo = QtWidgets.QPushButton(self.groupBoxWebcam)
-        self.btnRecordVideo.setGeometry(QtCore.QRect(230, 40, 150, 40))
-        self.btnRecordVideo.setText("Record Video")
-
-        self.labelRecordSec = QtWidgets.QLabel(self.groupBoxWebcam)
-        self.labelRecordSec.setGeometry(QtCore.QRect(30, 100, 130, 30))
-        self.labelRecordSec.setText("Record duration (s):")
-
-        self.spinBoxRecordSec = QtWidgets.QSpinBox(self.groupBoxWebcam)
-        self.spinBoxRecordSec.setGeometry(QtCore.QRect(160, 100, 60, 30))
-        self.spinBoxRecordSec.setRange(1, 60)
-        self.spinBoxRecordSec.setValue(5)
-
-        # Text edit for output
-        self.textEditOutput = QtWidgets.QTextEdit(self.centralwidget)
-        self.textEditOutput.setGeometry(QtCore.QRect(20, 480, 850, 180))
-        self.textEditOutput.setReadOnly(True)
-        fontOutput = QtGui.QFont()
-        fontOutput.setPointSize(10)
-        self.textEditOutput.setFont(fontOutput)
+        self.stackedWidget.addWidget(self.pageSystem)
+        self.stackedWidget.addWidget(self.pageProcesses)
+        self.stackedWidget.addWidget(self.pageApps)
+        self.stackedWidget.addWidget(self.pageFiles)
+        self.stackedWidget.addWidget(self.pageWebcam)
+        self.stackedWidget.addWidget(self.pageKeylogger)
+        self.stackedWidget.addWidget(self.pageEmpty)
 
         CustomModeWindow.setCentralWidget(self.centralwidget)
 
-        # Menubar and statusbar
-        self.menubar = QtWidgets.QMenuBar(CustomModeWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 900, 21))
-        CustomModeWindow.setMenuBar(self.menubar)
+        self.btnSystem.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
+        self.btnProcesses.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
+        self.btnApps.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
+        self.btnFiles.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(3))
+        self.btnWebcam.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(4))
+        self.btnKeylogger.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(5))
+        self.btnBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(6))
 
-        self.statusbar = QtWidgets.QStatusBar(CustomModeWindow)
-        CustomModeWindow.setStatusBar(self.statusbar)
+    def create_output_log(self):
+        label = QtWidgets.QLabel("📤 Output Log:")
+        text_output = QtWidgets.QTextEdit()
+        text_output.setReadOnly(True)
+        text_output.setMinimumHeight(80)
+        text_output.setStyleSheet("background-color: #f4f4f4; font-family: Consolas;")
+        return label, text_output
 
-        QtCore.QMetaObject.connectSlotsByName(CustomModeWindow)
+    def make_buttons_fixed(self, buttons, width=120, height=36):
+        for btn in buttons:
+            btn.setFixedSize(width, height)
+
+    def create_system_page(self):
+        page = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(page)
+        label = QtWidgets.QLabel("❗ Use these actions with caution. They will affect the entire system.")
+        label.setStyleSheet("color: gray; font-size: 12px;")
+        layout.addWidget(label)
+        self.btnRestart = QtWidgets.QPushButton("🔄 Restart")
+        self.btnRestart.setIcon(icon("restart.png"))
+        self.btnShutdown = QtWidgets.QPushButton("📴 Shutdown")
+        self.btnShutdown.setIcon(icon("shutdown.png"))
+        self.make_buttons_fixed([self.btnRestart, self.btnShutdown])
+        layout.addWidget(self.btnRestart)
+        layout.addWidget(self.btnShutdown)
+        layout.addSpacing(15)
+        log_label, log_output = self.create_output_log()
+        self.textOutputSystem = log_output
+        layout.addWidget(log_label)
+        layout.addWidget(log_output)
+        return page
+
+    def create_process_page(self):
+        page = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(page)
+        label = QtWidgets.QLabel("📋 Manage system processes. View, start, or stop processes by name or PID.")
+        label.setStyleSheet("color: gray; font-size: 12px;")
+        layout.addWidget(label)
+        button_layout = QtWidgets.QHBoxLayout()
+        self.btnListProcesses = QtWidgets.QPushButton("📄 List")
+        self.btnStartProcess = QtWidgets.QPushButton("🟢 Start")
+        self.btnStopProcess = QtWidgets.QPushButton("🔴 Stop")
+        self.make_buttons_fixed([self.btnListProcesses, self.btnStartProcess, self.btnStopProcess])
+        button_layout.addWidget(self.btnListProcesses)
+        button_layout.addWidget(self.btnStartProcess)
+        button_layout.addWidget(self.btnStopProcess)
+        layout.addLayout(button_layout)
+        self.tableProcesses = QtWidgets.QTableWidget()
+        self.tableProcesses.setColumnCount(3)
+        self.tableProcesses.setHorizontalHeaderLabels(['PID', 'Name', 'User'])
+        self.tableProcesses.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.tableProcesses.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.tableProcesses.verticalHeader().setVisible(False)
+        self.tableProcesses.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.tableProcesses.setSortingEnabled(True)
+        self.tableProcesses.setMinimumHeight(180)
+        self.tableProcesses.setMaximumHeight(200)
+        header = self.tableProcesses.horizontalHeader()
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
+        layout.addWidget(self.tableProcesses)
+        layout.addSpacing(15)
+        log_label, log_output = self.create_output_log()
+        self.textOutputProcesses = log_output
+        layout.addWidget(log_label)
+        layout.addWidget(log_output)
+        return page
+
+    def create_apps_page(self):
+        page = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(page)
+        label = QtWidgets.QLabel("💡 Start or stop apps by typing their exact name (e.g. chrome, notepad).")
+        label.setStyleSheet("color: gray; font-size: 12px;")
+        layout.addWidget(label)
+        self.btnListApps = QtWidgets.QPushButton("📄 List Apps")
+        self.btnStartApp = QtWidgets.QPushButton("🟢 Start App")
+        self.btnStopApp = QtWidgets.QPushButton("🔴 Stop App")
+        self.make_buttons_fixed([self.btnListApps, self.btnStartApp, self.btnStopApp])
+        layout.addWidget(self.btnListApps)
+        layout.addWidget(self.btnStartApp)
+        layout.addWidget(self.btnStopApp)
+        layout.addSpacing(15)
+        log_label, log_output = self.create_output_log()
+        self.textOutputApps = log_output
+        layout.addWidget(log_label)
+        layout.addWidget(log_output)
+        return page
+
+    def create_files_page(self):
+        page = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(page)
+        label = QtWidgets.QLabel("📄 Enter a full absolute file path (e.g. C:/Users/Name/Desktop/file.txt).")
+        label.setStyleSheet("color: gray; font-size: 12px;")
+        layout.addWidget(label)
+        self.lineEditFilePath = QtWidgets.QLineEdit()
+        self.lineEditFilePath.setPlaceholderText("Enter file path...")
+        self.btnGetFile = QtWidgets.QPushButton("📥 Get File Content")
+        self.make_buttons_fixed([self.btnGetFile], width=160)
+        layout.addWidget(self.lineEditFilePath)
+        layout.addWidget(self.btnGetFile)
+        layout.addSpacing(15)
+        log_label, log_output = self.create_output_log()
+        self.textOutputFiles = log_output
+        layout.addWidget(log_label)
+        layout.addWidget(log_output)
+        return page
+
+    def create_webcam_page(self):
+        page = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(page)
+        label = QtWidgets.QLabel("📷 Capture photo or record video using the target's webcam.")
+        label.setStyleSheet("color: gray; font-size: 12px;")
+        layout.addWidget(label)
+        self.btnCapturePhoto = QtWidgets.QPushButton("📸 Capture Photo")
+        self.btnRecordVideo = QtWidgets.QPushButton("🎥 Record Video")
+        self.spinBoxRecordSec = QtWidgets.QSpinBox()
+        self.spinBoxRecordSec.setRange(1, 60)
+        self.spinBoxRecordSec.setValue(5)
+        self.spinBoxRecordSec.setMaximumWidth(100)
+        self.make_buttons_fixed([self.btnCapturePhoto, self.btnRecordVideo], width=160)
+        layout.addWidget(self.btnCapturePhoto)
+        layout.addWidget(self.btnRecordVideo)
+        duration_layout = QtWidgets.QHBoxLayout()
+        duration_layout.addWidget(QtWidgets.QLabel("Duration (seconds):"))
+        duration_layout.addWidget(self.spinBoxRecordSec)
+        duration_layout.addStretch()
+        layout.addLayout(duration_layout)
+        layout.addSpacing(15)
+        log_label, log_output = self.create_output_log()
+        self.textOutputWebcam = log_output
+        layout.addWidget(log_label)
+        layout.addWidget(log_output)
+        return page
+
+    def create_keylogger_page(self):
+        page = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(page)
+        label = QtWidgets.QLabel("👁️ Keylogger will record keystrokes remotely.")
+        label.setStyleSheet("color: gray; font-size: 12px;")
+        layout.addWidget(label)
+        self.btnKeyLogger = QtWidgets.QPushButton("🔴 Start Keylogger")
+        self.btnKeyLogger.setIcon(icon("keylogger.png"))
+        self.make_buttons_fixed([self.btnKeyLogger], width=180)
+        layout.addWidget(self.btnKeyLogger)
+        layout.addSpacing(15)
+        log_label, log_output = self.create_output_log()
+        self.textOutputKeylogger = log_output
+        layout.addWidget(log_label)
+        layout.addWidget(log_output)
+        return page
