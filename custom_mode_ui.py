@@ -1,8 +1,11 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 import os
 
-def icon(path):
-    return QtGui.QIcon(os.path.join("icons", path))
+def image_path(filename):
+    return os.path.join(os.path.dirname(__file__), "images", filename)
+
+def icon(filename):
+    return QtGui.QIcon(image_path(filename))
 
 class Ui_CustomModeWindow(object):
     def setupUi(self, CustomModeWindow):
@@ -14,25 +17,18 @@ class Ui_CustomModeWindow(object):
         main_layout = QtWidgets.QVBoxLayout(self.centralwidget)
         main_layout.setContentsMargins(10, 10, 10, 10)
 
-        # === Taskbar/Header with its own QWidget ===
+        # Taskbar
         self.taskbarWidget = QtWidgets.QWidget()
-        self.taskbarWidget.setStyleSheet("""
-            background-color: #2c3e50;
-            padding: 12px;
-            border-radius: 8px;
-        """)
+        self.taskbarWidget.setStyleSheet("background-color: #2c3e50; padding: 12px; border-radius: 8px;")
         taskbar_layout = QtWidgets.QHBoxLayout(self.taskbarWidget)
         taskbar_layout.setContentsMargins(10, 0, 10, 0)
-
         self.labelTitle = QtWidgets.QLabel("🔧 Custom Control Center")
         self.labelTitle.setStyleSheet("font-size: 18px; font-weight: bold; color: white;")
         taskbar_layout.addWidget(self.labelTitle)
         taskbar_layout.addStretch()
-
         main_layout.addWidget(self.taskbarWidget)
 
-
-        # === IP Layout ===
+        # IP input
         ip_layout = QtWidgets.QHBoxLayout()
         self.lineEditServerIP = QtWidgets.QLineEdit()
         self.lineEditServerIP.setPlaceholderText("Enter server IP...")
@@ -40,10 +36,10 @@ class Ui_CustomModeWindow(object):
         ip_layout.addWidget(self.lineEditServerIP)
         main_layout.addLayout(ip_layout)
 
-        # === Content Layout ===
+        # Main content layout
         content_layout = QtWidgets.QHBoxLayout()
 
-        # === Sidebar ===
+        # Sidebar
         self.sidebar = QtWidgets.QWidget()
         main_sidebar_layout = QtWidgets.QVBoxLayout(self.sidebar)
         main_sidebar_layout.setContentsMargins(0, 0, 0, 0)
@@ -64,42 +60,34 @@ class Ui_CustomModeWindow(object):
         """
 
         self.btnSystem = QtWidgets.QPushButton("🖥️ System")
-        process_icon_path = os.path.join(os.path.dirname(__file__), "process.png")
         self.btnProcesses = QtWidgets.QPushButton("  Processes")
-        self.btnProcesses.setIcon(QtGui.QIcon(process_icon_path))
+        self.btnProcesses.setIcon(icon("process.png"))
         self.btnApps = QtWidgets.QPushButton("  Apps")
-        app_icon_path = os.path.join(os.path.dirname(__file__), "apps_icon.png")
-        self.btnApps.setIcon(QtGui.QIcon(app_icon_path))
+        self.btnApps.setIcon(icon("apps_icon.png"))
         self.btnFiles = QtWidgets.QPushButton("📁 Files")
         self.btnWebcam = QtWidgets.QPushButton("📷 Webcam")
-        keylogger_icon_path = os.path.join(os.path.dirname(__file__), "keylogger.png")
         self.btnKeylogger = QtWidgets.QPushButton("  Keylogger")
-        self.btnKeylogger.setIcon(QtGui.QIcon(keylogger_icon_path))
+        self.btnKeylogger.setIcon(icon("keylogger.png"))
 
-        top_btn_layout = QtWidgets.QVBoxLayout()
         for btn in [self.btnSystem, self.btnProcesses, self.btnApps,
                     self.btnFiles, self.btnWebcam, self.btnKeylogger]:
             btn.setStyleSheet(button_style)
-            top_btn_layout.addWidget(btn)
-        main_sidebar_layout.addLayout(top_btn_layout)
+            main_sidebar_layout.addWidget(btn)
 
-        logo_layout = QtWidgets.QVBoxLayout()
-        logo_layout.addStretch()
+        main_sidebar_layout.addStretch()
+
         self.labelSchoolLogo = QtWidgets.QLabel()
-        school_logo_path = os.path.join(os.path.dirname(__file__), "school_logo.png")
-        school_pixmap = QtGui.QPixmap(school_logo_path)
-        self.labelSchoolLogo.setPixmap(
-            school_pixmap.scaled(160, 160, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-        )
+        school_pixmap = QtGui.QPixmap(image_path("school_logo.png"))
+        self.labelSchoolLogo.setPixmap(school_pixmap.scaled(160, 160, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
         self.labelSchoolLogo.setAlignment(QtCore.Qt.AlignCenter)
-        logo_layout.addWidget(self.labelSchoolLogo)
-        logo_layout.addStretch()
-        main_sidebar_layout.addLayout(logo_layout)
+        main_sidebar_layout.addStretch()
+        main_sidebar_layout.addWidget(self.labelSchoolLogo, alignment=QtCore.Qt.AlignCenter)
+        main_sidebar_layout.addSpacing(20)  # Giảm số này nếu muốn lệch lên cao hơn
 
-        self.btnBack = QtWidgets.QPushButton("🔙 Back")
-        self.btnBack.setStyleSheet("""
+        self.btnBackToMain = QtWidgets.QPushButton("⬅ Back to Main")
+        self.btnBackToMain.setStyleSheet("""
             QPushButton {
-                background-color: #e74c3c;
+                background-color: #3498db;
                 color: white;
                 font-size: 14px;
                 padding: 10px;
@@ -107,19 +95,20 @@ class Ui_CustomModeWindow(object):
                 border: none;
             }
             QPushButton:hover {
-                background-color: #c0392b;
+                background-color: #2980b9;
             }
         """)
-        main_sidebar_layout.addWidget(self.btnBack, alignment=QtCore.Qt.AlignBottom)
+        main_sidebar_layout.addWidget(self.btnBackToMain)
 
         self.sidebar.setFixedWidth(160)
         content_layout.addWidget(self.sidebar)
 
-        # === Pages ===
+        # Pages
         self.stackedWidget = QtWidgets.QStackedWidget()
         content_layout.addWidget(self.stackedWidget)
         main_layout.addLayout(content_layout)
 
+        # Pages
         self.pageSystem = self.create_system_page()
         self.pageProcesses = self.create_process_page()
         self.pageApps = self.create_apps_page()
@@ -128,13 +117,9 @@ class Ui_CustomModeWindow(object):
         self.pageKeylogger = self.create_keylogger_page()
         self.pageEmpty = QtWidgets.QWidget()
 
-        self.stackedWidget.addWidget(self.pageSystem)
-        self.stackedWidget.addWidget(self.pageProcesses)
-        self.stackedWidget.addWidget(self.pageApps)
-        self.stackedWidget.addWidget(self.pageFiles)
-        self.stackedWidget.addWidget(self.pageWebcam)
-        self.stackedWidget.addWidget(self.pageKeylogger)
-        self.stackedWidget.addWidget(self.pageEmpty)
+        for page in [self.pageSystem, self.pageProcesses, self.pageApps,
+                     self.pageFiles, self.pageWebcam, self.pageKeylogger, self.pageEmpty]:
+            self.stackedWidget.addWidget(page)
 
         CustomModeWindow.setCentralWidget(self.centralwidget)
 
@@ -144,7 +129,6 @@ class Ui_CustomModeWindow(object):
         self.btnFiles.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(3))
         self.btnWebcam.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(4))
         self.btnKeylogger.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(5))
-        self.btnBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(6))
 
     def create_output_log(self):
         label = QtWidgets.QLabel("📤 Output Log:")
@@ -210,7 +194,7 @@ class Ui_CustomModeWindow(object):
         layout.addWidget(self.tableProcesses)
         layout.addSpacing(15)
         log_label, log_output = self.create_output_log()
-        self.textOutputProcesses = log_output
+        self.textOutputProcess = log_output
         layout.addWidget(log_label)
         layout.addWidget(log_output)
         return page
@@ -218,22 +202,119 @@ class Ui_CustomModeWindow(object):
     def create_apps_page(self):
         page = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout(page)
+        layout.setSpacing(10)  # 🔧 Giảm khoảng cách giữa các khối dọc
+
+        # Info label
         label = QtWidgets.QLabel("💡 Start or stop apps by typing their exact name (e.g. chrome, notepad).")
         label.setStyleSheet("color: gray; font-size: 12px;")
         layout.addWidget(label)
+
+        # List Apps Button
         self.btnListApps = QtWidgets.QPushButton("📄 List Apps")
-        self.btnStartApp = QtWidgets.QPushButton("🟢 Start App")
-        self.btnStopApp = QtWidgets.QPushButton("🔴 Stop App")
-        self.make_buttons_fixed([self.btnListApps, self.btnStartApp, self.btnStopApp])
-        layout.addWidget(self.btnListApps)
-        layout.addWidget(self.btnStartApp)
-        layout.addWidget(self.btnStopApp)
-        layout.addSpacing(15)
+        self.make_buttons_fixed([self.btnListApps])
+        list_app_layout = QtWidgets.QHBoxLayout()
+        list_app_layout.setContentsMargins(0, 0, 0, 0)
+        list_app_layout.setSpacing(6)
+        list_app_layout.addWidget(self.btnListApps)
+        list_app_layout.addStretch()
+        layout.addLayout(list_app_layout)
+
+        # --- Start App Stack ---
+        self.startStack = QtWidgets.QStackedWidget()
+
+        # Start button only
+        start_button_only = QtWidgets.QWidget()
+        h1 = QtWidgets.QHBoxLayout(start_button_only)
+        h1.setContentsMargins(0, 0, 0, 0)
+        h1.setSpacing(6)
+        self.btnStartAppOnly = QtWidgets.QPushButton("🟢 Start App")
+        self.make_buttons_fixed([self.btnStartAppOnly])
+        h1.addWidget(self.btnStartAppOnly)
+        h1.addStretch()
+
+        # Start with input
+        start_input = QtWidgets.QWidget()
+        h2 = QtWidgets.QHBoxLayout(start_input)
+        h2.setContentsMargins(0, 0, 0, 0)
+        h2.setSpacing(6)
+        self.btnStartAppInput = QtWidgets.QPushButton("🟢 Start App")
+        self.lineEditStartApp = QtWidgets.QLineEdit()
+        self.lineEditStartApp.setPlaceholderText("Enter app name to start...")
+        self.lineEditStartApp.setMinimumWidth(200)
+        self.lineEditStartApp.setMinimumHeight(36)
+        self.lineEditStartApp.setStyleSheet("font-size: 14px; padding: 6px;")
+        self.make_buttons_fixed([self.btnStartAppInput])
+        h2.addWidget(self.btnStartAppInput)
+        h2.addWidget(self.lineEditStartApp)
+
+        self.startStack.addWidget(start_button_only)
+        self.startStack.addWidget(start_input)
+        start_wrapper = QtWidgets.QWidget()
+        start_layout = QtWidgets.QVBoxLayout(start_wrapper)
+        start_layout.setContentsMargins(0, 0, 0, 0)
+        start_layout.addWidget(self.startStack)
+        self.startStack.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        layout.addWidget(start_wrapper)
+
+        # --- Stop App Stack ---
+        self.stopStack = QtWidgets.QStackedWidget()
+
+        # Stop button only
+        stop_button_only = QtWidgets.QWidget()
+        h3 = QtWidgets.QHBoxLayout(stop_button_only)
+        h3.setContentsMargins(0, 0, 0, 0)
+        h3.setSpacing(6)
+        self.btnStopAppOnly = QtWidgets.QPushButton("🔴 Stop App")
+        self.make_buttons_fixed([self.btnStopAppOnly])
+        h3.addWidget(self.btnStopAppOnly)
+        h3.addStretch()
+
+        # Stop with input
+        stop_input = QtWidgets.QWidget()
+        h4 = QtWidgets.QHBoxLayout(stop_input)
+        h4.setContentsMargins(0, 0, 0, 0)
+        h4.setSpacing(6)
+        self.btnStopAppInput = QtWidgets.QPushButton("🔴 Stop App")
+        self.lineEditStopApp = QtWidgets.QLineEdit()
+        self.lineEditStopApp.setPlaceholderText("Enter app name to stop...")
+        self.lineEditStopApp.setMinimumWidth(200)
+        self.lineEditStopApp.setMinimumHeight(36)
+        self.lineEditStopApp.setStyleSheet("font-size: 14px; padding: 6px;")
+        self.make_buttons_fixed([self.btnStopAppInput])
+        h4.addWidget(self.btnStopAppInput)
+        h4.addWidget(self.lineEditStopApp)
+
+        self.stopStack.addWidget(stop_button_only)
+        self.stopStack.addWidget(stop_input)
+        stop_wrapper = QtWidgets.QWidget()
+        stop_layout = QtWidgets.QVBoxLayout(stop_wrapper)
+        stop_layout.setContentsMargins(0, 0, 0, 0)
+        stop_layout.addWidget(self.stopStack)
+        self.stopStack.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        layout.addWidget(stop_wrapper)
+
+        # --- Output Log ---
         log_label, log_output = self.create_output_log()
-        self.textOutputApps = log_output
+        self.textEditAppLog = log_output
+        log_output.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         layout.addWidget(log_label)
         layout.addWidget(log_output)
+
+        # --- Events ---
+        self.btnStartAppOnly.clicked.connect(self.toggle_start_input)
+        self.btnStartAppInput.clicked.connect(self.toggle_start_input)
+        self.btnStopAppOnly.clicked.connect(self.toggle_stop_input)
+        self.btnStopAppInput.clicked.connect(self.toggle_stop_input)
+
         return page
+
+    def toggle_start_input(self):
+        self.startStack.setCurrentIndex(1 if self.startStack.currentIndex() == 0 else 0)
+        self.stopStack.setCurrentIndex(0)
+
+    def toggle_stop_input(self):
+        self.stopStack.setCurrentIndex(1 if self.stopStack.currentIndex() == 0 else 0)
+        self.startStack.setCurrentIndex(0)
 
     def create_files_page(self):
         page = QtWidgets.QWidget()
